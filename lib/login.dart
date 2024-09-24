@@ -20,7 +20,7 @@ class _LoginPageState extends State<LoginPage> {
     // Validate form before proceeding with login
     if (_formKey.currentState?.validate() ?? false) {
       setState(() {
-        errorMessage = null;
+       errorMessage = null;
       });
 
       try {
@@ -35,7 +35,7 @@ class _LoginPageState extends State<LoginPage> {
 
         Navigator.pushReplacement(
           context,
-          MaterialPageRoute(builder: (context) => ShoeHomePage()),
+          MaterialPageRoute(builder: (context) => HomePage()),
         );
       } on FirebaseAuthException catch (e) {
         switch (e.code) {
@@ -78,7 +78,7 @@ class _LoginPageState extends State<LoginPage> {
       body: Container(
         decoration: const BoxDecoration(
           image: DecorationImage(
-            image: AssetImage('assets/images/backk.jpg'),
+            image: AssetImage('assets/images/back21.png'),
             fit: BoxFit.cover,
           ),
         ),
@@ -178,7 +178,7 @@ class _LoginPageState extends State<LoginPage> {
                       ),
                     ],
 
-                    const SizedBox(height: 60),
+                    const SizedBox(height: 20),
                     TextButton(
                       onPressed: () {
                         Navigator.pushNamed(context, '/signup');

@@ -1,101 +1,147 @@
 import 'package:flutter/material.dart';
-import 'package:logging/login.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'Details.dart';
+import 'CartModel.dart';
 
-class MyApp extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      theme: ThemeData(
-        primarySwatch: Colors.blue,
-        visualDensity: VisualDensity.adaptivePlatformDensity,
-      ),
-      home: ShoeHomePage(),
-    );
-  }
-}
-
-class ShoeHomePage extends StatelessWidget {
+class HomePage extends StatelessWidget {
   final List<Map<String, String>> shoes = [
-    {
-      'name': 'Sneaker X',
-      'price': '\$120',
-      'image': 'assets/images/shoe1.jpg'
-    },
-    {
-      'name': 'Running Pro',
-      'price': '\$150',
-      'image': 'assets/images/shoe2.jpg'
-    },
-    {
-      'name': 'Casual Kick',
-      'price': '\$80',
-      'image': 'assets/images/shoe3.png'
-    },
+    {'name': 'Nike', 'image': 'assets/images/two.jpg', 'price': '50'},
+    {'name': 'Salomon', 'image': 'assets/images/three.jpg', 'price': '80'},
+    {'name': 'Run', 'image': 'assets/images/six.jpg', 'price': '40'},
+    {'name': 'Addidas', 'image': 'assets/images/seven.jpg', 'price': '60'},
+    {'name': 'Jordan', 'image': 'assets/images/one.jpg', 'price': '90'},
+    {'name': 'Air', 'image': 'assets/images/ten.jpg', 'price': '70'},
   ];
 
-  ShoeHomePage({super.key});
+  final List<Color> cardColors = [
+    const Color.fromARGB(255, 6, 170, 211),
+    const Color.fromARGB(255, 239, 242, 239),
+    const Color.fromARGB(255, 251, 186, 6),
+    const Color.fromARGB(255, 156, 238, 41),
+    const Color.fromARGB(255, 212, 18, 18),
+    const Color.fromARGB(255, 229, 190, 230),
+  ];
+
+  HomePage({super.key});
+
+  // Method to handle logout
+  Future<void> _logout(BuildContext context) async {
+    await FirebaseAuth.instance.signOut();
+    Navigator.pushReplacementNamed(context, '/login'); 
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(
+        elevation: 10,
+        shadowColor: const Color.fromARGB(255, 7, 255, 181),
+        backgroundColor: const Color.fromARGB(197, 223, 225, 226),
+        centerTitle: true,
+        title: const Text(
+          'Shoe Store',
+          style: TextStyle(
+            fontSize: 30,
+            fontWeight: FontWeight.bold,
+            color: Color.fromARGB(255, 0, 0, 0),
+          ),
+        ),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.logout),
+            onPressed: () => _logout(context), 
+            tooltip: 'Logout',
+          ),
+        ],
+      ),
       body: Stack(
         children: [
-          // Background image
           Positioned.fill(
-            child: Image.asset(
-              'assets/images/nike.jpg', 
-              fit: BoxFit.cover,
+            child: Opacity(
+              opacity: 1,
+              child: Image.asset(
+                'assets/images/backk.jpeg',
+                fit: BoxFit.cover,
+              ),
             ),
           ),
-          // Foreground content
-          Center(
-            child: Column(
-              children: [
-                AppBar(
-                  title: const Text("My Shoes App",
-                   style: TextStyle(
-                    fontSize: 30,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.white,
-                   ),
-                  ),
-                  backgroundColor: Color.fromARGB(167, 51, 214, 225),
-                  elevation: 7,
-                  shadowColor: const Color.fromARGB(255, 33, 47, 243),
-                ),
-                const SizedBox(height: 30,),
-                Expanded(
-                  child: ListView.builder(
-                    itemCount: shoes.length,
-                    itemBuilder: (context, index) {
-                      final shoe = shoes[index];
-                      return Card(
-                        elevation: 5,
-                        margin: const EdgeInsets.all(10),
-                        child: ListTile(
-                          contentPadding: const EdgeInsets.all(10),
-                          leading: Image.network(
-                            shoe['image']!,
-                            width: 80,
-                            height: 80,
-                            fit: BoxFit.cover,
+          ListView.builder(
+            itemCount: shoes.length,
+            itemBuilder: (context, index) {
+              return GestureDetector(
+                onTap: () {
+                  final shoe = Shoe(
+                    name: shoes[index]['name']!,
+                    imageUrl: shoes[index]['image']!,
+                    price: double.parse(shoes[index]['price']!),
+                  );
+
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => ShoeDetailsPage(shoe: shoe),
+                    ),
+                  );
+                },
+                child: Container(
+                  padding: const EdgeInsets.all(1),
+                  child: Card(
+                    elevation: 4,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(15),
+                    ),
+                    color: cardColors[index % cardColors.length],
+                    child: Padding(
+                      padding: const EdgeInsets.all(15.0),
+                      child: Row(
+                        children: [
+                          Container(
+                            height: 200,
+                            width: 200,
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(12),
+                              border: Border.all(
+                                color: Colors.grey.withOpacity(0.5),
+                              ),
+                            ),
+                            child: ClipRRect(
+                              borderRadius: BorderRadius.circular(12),
+                              child: Image.asset(
+                                height: 200,
+                                width: 200,
+                                shoes[index]['image']!,
+                                fit: BoxFit.cover,
+                              ),
+                            ),
                           ),
-                          title: Text(shoe['name']!),
-                          subtitle: Text(shoe['price']!),
-                          trailing: Icon(Icons.arrow_forward_ios),
-                        ),
-                      );
-                    },
+                          const SizedBox(width: 10), // Space between image and text
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                shoes[index]['name']!,
+                                style: const TextStyle(
+                                  fontSize: 25,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                              const SizedBox(height: 5),
+                              Text(
+                                '\$${shoes[index]['price']}',
+                                style: const TextStyle(
+                                  fontSize: 20,
+                                  color: Color.fromARGB(255, 0, 0, 0),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                    ),
                   ),
                 ),
-                 ElevatedButton(
-                    onPressed: () {
-                      Navigator.push(context, MaterialPageRoute(builder: ((context) => const LoginPage())));
-                    },
-                    child: const Text('Logout'),
-                  ),
-              ]
-            ),
+              );
+            },
           ),
         ],
       ),
